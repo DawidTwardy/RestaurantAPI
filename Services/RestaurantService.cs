@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using RestaurantAPI.Entity;
+using RestaurantAPI.Exceptions;
 using RestaurantAPI.Models;
 
 namespace RestaurantAPI.Services
@@ -18,26 +19,26 @@ namespace RestaurantAPI.Services
             _Mapper = mapper;
             this.logger = logger;
         }
-        public bool Delete(int id)
+        public void Delete(int id)
         {
             logger.LogError($"Restaurant with id:{id} DELETE action invoked");
             var restaurant = _DbContext
                 .Restaurants
                 .FirstOrDefault(r => r.Id == id);
-            if (restaurant is null) return false;
+            if (restaurant is null) throw new NotFoundException("Restaurant Not Found");
             else
             {
                 _DbContext.Restaurants.Remove(restaurant);
                 _DbContext.SaveChanges();
-                return true;
+                
             }
         }
-        public bool Update(int id,UpdateRestuarantDto dto)
+        public void Update(int id,UpdateRestuarantDto dto)
         {
             var restaurant = _DbContext
                 .Restaurants
                 .FirstOrDefault(r => r.Id == id);
-            if (restaurant is null) return false;
+            if (restaurant is null) throw new NotFoundException("Restaurant Not Found");
             else
             {
                 restaurant.Name = dto.name;
@@ -45,7 +46,7 @@ namespace RestaurantAPI.Services
                 restaurant.HasDelivery = dto.hasDelivery;
                 _DbContext.Restaurants.Update(restaurant);
                 _DbContext.SaveChanges();
-                return true;
+                
             }
         } 
 
@@ -56,7 +57,7 @@ namespace RestaurantAPI.Services
                 .Include(r => r.Address)
                 .Include(r => r.Dishes)
                 .FirstOrDefault(r => r.Id == id);
-            if (restaurant is null) return null;
+            if (restaurant is null) throw new NotFoundException("Restaurant Not Found");
             var result = _Mapper.Map<RestaurantDto>(restaurant);
             return result;
         }
