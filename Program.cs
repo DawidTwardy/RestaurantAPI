@@ -17,6 +17,7 @@ builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Host.UseNLog();
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
+builder.Services.AddScoped<RequestTimeMiddleware>();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
@@ -32,6 +33,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseMiddleware<RequestTimeMiddleware>();
 app.UseHttpsRedirection();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
