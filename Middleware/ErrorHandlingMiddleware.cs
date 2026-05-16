@@ -1,5 +1,6 @@
 ﻿
 using RestaurantAPI.Exceptions;
+using BadRequestException = RestaurantAPI.Exceptions.BadRequestException;
 
 namespace RestaurantAPI.Middleware
 {
@@ -17,6 +18,11 @@ namespace RestaurantAPI.Middleware
             try
             {
                 await next.Invoke(context);
+            }
+            catch (BadRequestException badHttpRequestException)
+            {
+                context.Response.StatusCode = 400;
+                await context.Response.WriteAsync(badHttpRequestException.Message);
             }
             catch (NotFoundException notFoundExpencion)
             {
